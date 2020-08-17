@@ -46,6 +46,12 @@ class KalmanFilter {
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
+  /**
+   * Runs common logic in the update step for EKF and regular KF
+   * @param y vector calculated in either Update() or UpdateEKF()
+   */
+  void FinishUpdate(const Eigen::VectorXd &y);
+
   // state vector
   Eigen::VectorXd x_;
 
