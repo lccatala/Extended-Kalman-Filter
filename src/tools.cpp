@@ -57,10 +57,6 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   }
   
   // Compute the Jacobian matrix
-  float sum = px * px + py * py;
-  if (sum < 0.0001) {
-    sum = 0.0001;
-  }
   float sqrt_sum = sqrt(sum);
   float qx = px / sqrt_sum;
   float qy = py / sqrt_sum;
