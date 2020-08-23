@@ -39,11 +39,10 @@ FusionEKF::FusionEKF() {
          1, 1, 0, 0,
          1, 1, 1, 1;
 
-  ekf_.P_ = MatrixXd(4, 4);
-  ekf_.P_ << 1, 0,    0,    0,
-             0, 1,    0,    0,
-             0, 0,    1000, 0,
-             0, 0,    0,    1000;
+  // Deferred initialization of ekf_.P_ to measurement update
+  // Deferred initialization of ekf_.R_ to measurement update
+  // Deferred initialization of ekf_.F_ to measurement prediction
+  // Deferred initialization of ekf_.Q_ to measurement prediction
 }
 
 /**
@@ -60,7 +59,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // First measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       // Convert from polar to cartesian
@@ -84,6 +82,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
       ekf_.x_ << x, y, vx, vy;
     }
+
+      ekf_.P_ = MatrixXd(4, 4);
+      ekf_.P_ << 1, 0,    0,    0,
+                 0, 1,    0,    0,
+                 0, 0,    1000, 0,
+                 0, 0,    0,    1000;
 
     // done initializing, no need to predict or update
     previous_timestamp_ = measurement_pack.timestamp_;
@@ -126,6 +130,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // Radar updates
     Hj_ = tools.CalculateJacobian(ekf_.x_);
     ekf_.H_ = Hj_;
+    ekf_.R_ = R_radar_;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
 
   } else {
